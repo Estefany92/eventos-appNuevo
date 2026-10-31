@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Productos{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between mb-3"><h3>Productos y servicios</h3>
+  {% if current_user.es_admin %}<a class="btn btn-primary" href="{{ url_for('productos.crear') }}">+ Nuevo</a>{% endif %}</div>
+<div class="card"><table class="table mb-0 align-middle">
+  <thead><tr><th>Nombre</th><th>Tipo</th><th>Precio</th><th>Descripción</th>{% if current_user.es_admin %}<th>Estado</th><th></th>{% endif %}</tr></thead>
+  <tbody>
+  {% for p in productos %}
+    <tr>
+      <td>{{ p.nombre }}</td>
+      <td><span class="badge bg-{{ 'info' if p.tipo=='servicio' else 'secondary' }}">{{ p.tipo }}</span></td>
+      <td>${{ '%.2f'|format(p.precio) }}</td><td>{{ p.descripcion or '' }}</td>
+      {% if current_user.es_admin %}
+      <td>{{ 'Activo' if p.activo else 'Inactivo' }}</td>
+      <td class="text-end">
+        <a class="btn btn-sm btn-outline-primary" href="{{ url_for('productos.editar', id=p.id) }}">Editar</a>
+        <form method="post" action="{{ url_for('productos.eliminar', id=p.id) }}" class="d-inline"
+              onsubmit="return confirm('¿Eliminar este producto?')">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="btn btn-sm btn-outline-danger">Eliminar</button></form>
+      </td>{% endif %}
+    </tr>
+  {% else %}<tr><td colspan="6" class="text-center text-muted py-4">Sin productos.</td></tr>{% endfor %}
+  </tbody></table></div>
+{% endblock %}

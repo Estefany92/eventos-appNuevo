@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Inicio{% endblock %}
+{% block content %}
+<h3>Hola, {{ current_user.nombre }}</h3>
+<div class="row g-3 my-2">
+  <div class="col-md-6"><div class="card"><div class="card-body">
+    <h6 class="text-muted">Productos y servicios activos</h6><div class="fs-2">{{ total_productos }}</div></div></div></div>
+  <div class="col-md-6"><div class="card"><div class="card-body">
+    <h6 class="text-muted">Próximos eventos</h6><div class="fs-2">{{ proximos|length }}</div></div></div></div>
+</div>
+<div class="card mt-3"><div class="card-body">
+  <div class="d-flex justify-content-between mb-2"><h5>Próximos eventos</h5>
+    <a class="btn btn-primary btn-sm" href="{{ url_for('eventos.crear') }}">+ Agendar evento</a></div>
+  {% for e in proximos %}
+    <div class="d-flex justify-content-between border-bottom py-2">
+      <a href="{{ url_for('eventos.detalle', id=e.id) }}">{{ e.nombre }}</a>
+      <span class="text-muted">{{ e.fecha.strftime('%d/%m/%Y %H:%M') }} · {{ e.estado }}</span>
+    </div>
+  {% else %}<p class="text-muted mb-0">No hay eventos próximos.</p>{% endfor %}
+</div></div>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}{{ evento.nombre }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-start mb-3">
+  <div><h3 class="mb-0">{{ evento.nombre }}</h3>
+    <span class="text-muted">{{ evento.fecha.strftime('%d/%m/%Y %H:%M') }} · {{ evento.lugar }} · Cliente: {{ evento.cliente.nombre }}</span></div>
+  <span class="badge bg-{{ {'pendiente':'warning','confirmado':'success','cancelado':'danger'}[evento.estado] }} fs-6">{{ evento.estado }}</span>
+</div>
+{% if evento.notas %}<p>{{ evento.notas }}</p>{% endif %}
+<div class="card mb-3"><table class="table mb-0">
+  <thead><tr><th>Producto</th><th>Tipo</th><th>Cant.</th><th>P. unitario</th><th>Subtotal</th></tr></thead>
+  <tbody>{% for i in evento.items %}
+    <tr><td>{{ i.producto.nombre }}</td><td>{{ i.producto.tipo }}</td><td>{{ i.cantidad }}</td>
+      <td>${{ '%.2f'|format(i.precio_unitario) }}</td><td>${{ '%.2f'|format(i.subtotal) }}</td></tr>{% endfor %}
+  </tbody>
+  <tfoot><tr><th colspan="4" class="text-end">Total</th><th>${{ '%.2f'|format(evento.total) }}</th></tr></tfoot>
+</table></div>
+{% if current_user.es_admin %}
+<form method="post" action="{{ url_for('eventos.cambiar_estado', id=evento.id) }}" class="d-flex gap-2 mb-3" style="max-width:350px">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <select name="estado" class="form-select">{% for e in estados %}<option {{ 'selected' if e==evento.estado }}>{{ e }}</option>{% endfor %}</select>
+  <button class="btn btn-outline-primary">Cambiar</button>
+</form>{% endif %}
+<a class="btn btn-primary" href="{{ url_for('eventos.editar', id=evento.id) }}">Editar</a>
+<a class="btn btn-link" href="{{ url_for('eventos.listar') }}">Volver</a>
+{% endblock %}

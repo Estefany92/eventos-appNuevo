@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Eventos{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between mb-3"><h3>Eventos agendados</h3>
+  <a class="btn btn-primary" href="{{ url_for('eventos.crear') }}">+ Agendar evento</a></div>
+<div class="card"><table class="table mb-0 align-middle">
+  <thead><tr><th>Fecha</th><th>Evento</th><th>Lugar</th>{% if current_user.es_admin %}<th>Cliente</th>{% endif %}<th>Estado</th><th>Total</th><th></th></tr></thead>
+  <tbody>
+  {% for e in eventos %}
+    <tr>
+      <td>{{ e.fecha.strftime('%d/%m/%Y %H:%M') }}</td>
+      <td><a href="{{ url_for('eventos.detalle', id=e.id) }}">{{ e.nombre }}</a></td>
+      <td>{{ e.lugar }}</td>
+      {% if current_user.es_admin %}<td>{{ e.cliente.nombre }}</td>{% endif %}
+      <td><span class="badge bg-{{ {'pendiente':'warning','confirmado':'success','cancelado':'danger'}[e.estado] }}">{{ e.estado }}</span></td>
+      <td>${{ '%.2f'|format(e.total) }}</td>
+      <td class="text-end"><a class="btn btn-sm btn-outline-primary" href="{{ url_for('eventos.editar', id=e.id) }}">Editar</a>
+        <form method="post" action="{{ url_for('eventos.eliminar', id=e.id) }}" class="d-inline"
+              onsubmit="return confirm('¿Eliminar este evento?')">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="btn btn-sm btn-outline-danger">Eliminar</button></form></td>
+    </tr>
+  {% else %}<tr><td colspan="7" class="text-center text-muted py-4">No hay eventos.</td></tr>{% endfor %}
+  </tbody></table></div>
+{% endblock %}
